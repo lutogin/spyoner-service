@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  spyoner:
+    build:
+      context: ./app/spyoner
+      dockerfile: Dockerfile
+    container_name: ria_spy.spyoner
+    volumes:
+      - ./app/spyoner:/app
+      - /app/node_modules
+    ports:
+      - "8080:3000"

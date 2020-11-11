@@ -1,0 +1,12 @@
+{
+  "name": "ria-spyoner-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "start": "docker-compose up"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

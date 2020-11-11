@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+  compositor:
+    build:
+      context: ./app/compositor
+      dockerfile: Dockerfile
+    container_name: ria_spy.compositor
+    volumes:
+      - ./app/compositor:/app
+#      - /app/node_modules
+    ports:
+      - "34001:3000"
+    depends_on:
+      - mysql-db
+      - kafka
+    networks:
+      - ria-spyoner-network
+
+  spyoner:
+    build:
+      context: ./app/spyoner
+      dockerfile: Dockerfile
+    container_name: ria_spy.spyoner
+    volumes:
+      - ./app/spyoner:/app
+#      - /app/node_modules
+    ports:
+      - "34000:3000"
+      - "9229:9229"
+    depends_on:
+      - compositor
+      - kafka
+      - zookeeper
+      - mysql-db
+    networks:
+      - ria-spyoner-network
+
+  mysql-db:
+    image: mysql:5.7
+    container_name: ria_spy.mysql
+    restart: always
+    env_file: .mysql.env
+    ports:
+      - 3306:3306
+    volumes:
+      - ria_spy-mysql-db:/var/lib/mysql
+    networks:
+      - ria-spyoner-network
+
+  zookeeper:
+    image: confluent/zookeeper
+    container_name: ria_spy.zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      zk_id: "1"
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - ria-spyoner-network
+
+  kafka:
+    image: confluent/kafka
+    container_name: ria_spy.kafka
+    hostname: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - ria-spyoner-network
+
+networks:
+  ria-spyoner-network:
+
+volumes:
+  ria_spy-mysql-db:
+    driver: local
