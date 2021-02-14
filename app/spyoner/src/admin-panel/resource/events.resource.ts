@@ -1,6 +1,7 @@
 import { ResourceWithOptions } from 'admin-bro';
 import { ProcessService } from '../../process/process.service';
 import { EventEntity } from '../../events/event.entity';
+import axios from 'axios';
 
 const processService = new ProcessService();
 
@@ -23,6 +24,11 @@ const EventResource: ResourceWithOptions = {
               ...request.payload,
               processId: (await processService.getProcessIdByName(request.payload.processName)).id,
             };
+
+            /**
+             * Send request to reload consumer
+             */
+            axios.post('')
           }
           return request;
         },

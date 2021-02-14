@@ -58,4 +58,9 @@ export class ConsumerService {
       },
     });
   }
+
+  async reloadConsumer() {
+    await this.client.disconnect();
+    await this.onModuleInit();
+  }
 }
